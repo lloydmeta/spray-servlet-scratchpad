@@ -52,7 +52,7 @@ trait ApiService extends HttpService {
                 Get(
                   "http://metascraper.beachape.com/scrape/" + java.net.URLEncoder.encode(urlScrape.url, "UTF8")
                 )
-              ).map (_.entity.asString).recover { case _ => "failed" } )
+              ).map (_.entity.asString) )
           }
         }
       }

@@ -48,7 +48,6 @@ trait ApiService extends HttpService {
         respondWithMediaType(`application/json`) {
           entity(as[UrlScrape]) { urlScrape =>
             complete(
-
               pipeline(
                 Get(
                   "http://metascraper.beachape.com/scrape/" + java.net.URLEncoder.encode(urlScrape.url, "UTF8")

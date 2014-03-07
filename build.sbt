@@ -15,7 +15,9 @@ libraryDependencies ++= {
   val sprayV = "1.3.0"
   Seq(
     "io.spray"            %   "spray-servlet" % sprayV,
+    "io.spray" %%  "spray-json" % "1.2.5",
     "io.spray"            %   "spray-routing" % sprayV,
+    "io.spray"            %   "spray-client" % sprayV,
     "io.spray"            %   "spray-testkit" % sprayV % "test",
     "org.eclipse.jetty" % "jetty-webapp" % "9.1.0.v20131115" % "container",
     "org.eclipse.jetty" % "jetty-plus"   % "9.1.0.v20131115" % "container",

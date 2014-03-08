@@ -2,6 +2,7 @@ package com.beachape
 
 import akka.actor.{Props, ActorSystem}
 import spray.servlet.WebBoot
+import com.beachape.controllers.ApiServiceActor
 
 // this class is instantiated by the servlet initializer
 // it needs to have a default constructor and implement

@@ -7,13 +7,14 @@ import StatusCodes._
 import models._
 import models.UrlScrapeJsonSupport._
 import scala.concurrent.duration._
+import com.beachape.controllers.ApiService
 
 class ApiServiceSpec extends Specification with Specs2RouteTest with ApiService {
 
   implicit val routeTestTimeout = RouteTestTimeout(FiniteDuration(5, SECONDS))
 
   def actorRefFactory = system
-  
+
   "ApiService" should {
 
     "return a greeting for GET requests to the root path" in {

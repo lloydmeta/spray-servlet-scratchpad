@@ -1,6 +1,6 @@
 package com.beachape.controllers
 
-import akka.actor.Actor
+import akka.actor.{ActorRefFactory, Actor}
 import spray.routing._
 import spray.http._
 import MediaTypes._
@@ -13,16 +13,18 @@ import com.gettyimages.spray.swagger.SwaggerHttpService
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
-class ApiServiceActor extends Actor with ApiService with SwaggerHttpService {
+class ApiServiceActor extends Actor with ApiService {
 
-  val baseUrl = "swaggur"
-  val specPath = "swagger"
-  val resourcePath = "swagger_resources"
-  val apiTypes = Seq(typeOf[ApiService])
-  val swaggerVersion = "1.2"
-  val apiVersion = "0.0.1"
-  val modelTypes = Seq(typeOf[UrlScrape])
-
+  val swaggerService: SwaggerHttpService = new SwaggerHttpService {
+    override def actorRefFactory: ActorRefFactory = context
+    override def apiTypes: List[Type] = List(typeOf[ApiService])
+    override def modelTypes: Seq[Type] = List(typeOf[UrlScrape])
+    override def apiVersion: String = "1.0"
+    override def swaggerVersion: String = "1.2"
+    override def baseUrl: String = "/"
+    override def specPath: String = "api-spec"
+    override def resourcePath: String = "resources"
+  }
 
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
@@ -31,7 +33,7 @@ class ApiServiceActor extends Actor with ApiService with SwaggerHttpService {
   // this actor only runs our route, but you could add
   // other things here, like request stream processing
   // or timeout handling
-  def receive = runRoute(apiRoutes ~ routes)
+  def receive = runRoute(apiRoutes ~ swaggerService.routes)
 }
 
 
@@ -44,7 +46,7 @@ trait ApiService extends HttpService {
   val pipeline = sendReceive
   val apiRoutes = scrapeRoute
 
-  @ApiOperation(value = "Scrape a URL.", notes = "Sends a request to http://metascraper.beachape.com to get it scraped", response = classOf[UrlScrape], httpMethod = "POST")
+  @ApiOperation(value = "Scrape a URL.", notes = "Sends a request to http://metascraper.beachape.com to get it scraped", httpMethod = "POST")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "url", value = "The URL to scrape", required = true, dataType = "String", paramType = "body")
   ))
@@ -67,4 +69,3 @@ trait ApiService extends HttpService {
   }
 
 }
-

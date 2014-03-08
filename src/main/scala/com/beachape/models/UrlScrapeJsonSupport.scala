@@ -2,8 +2,10 @@ package com.beachape.models
 
 import spray.httpx.SprayJsonSupport
 import spray.json.DefaultJsonProtocol
+import com.wordnik.swagger.annotations.ApiModel
 
 
+@ApiModel(description = "URL Scrape message")
 case class UrlScrape(url: String)
 
 /**

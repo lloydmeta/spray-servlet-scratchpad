@@ -25,7 +25,8 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV % "test",
     "org.specs2"          %%  "specs2"        % "2.2.3" % "test",
-    "com.wordnik" %% "swagger-core" % "1.3.0"
+    "com.wordnik" %% "swagger-core" % "1.3.0",
+    "com.beachape.metascraper" %% "metascraper" % "0.2.5"
   )
 }
 

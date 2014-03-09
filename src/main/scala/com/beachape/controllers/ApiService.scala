@@ -5,11 +5,14 @@ import spray.routing._
 import spray.http._
 import MediaTypes._
 import spray.client.pipelining._
-import com.beachape.models.UrlScrape
 import scala.reflect.runtime.universe._
-import com.beachape.models.UrlScrapeJsonSupport._
+import com.beachape.models._
 import com.wordnik.swagger.annotations._
 import com.gettyimages.spray.swagger.SwaggerHttpService
+import scala.concurrent.Future
+import spray.util.LoggingContext
+import spray.httpx.UnsuccessfulResponseException
+import spray.http.StatusCodes._
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -18,7 +21,7 @@ class ApiServiceActor extends Actor with ApiService {
   val swaggerService: SwaggerHttpService = new SwaggerHttpService {
     override def actorRefFactory: ActorRefFactory = context
     override def apiTypes: List[Type] = List(typeOf[ApiService])
-    override def modelTypes: Seq[Type] = List(typeOf[UrlScrape])
+    override def modelTypes: Seq[Type] = List(typeOf[UrlScrape], typeOf[ScrapedData], typeOf[ErrorResponse])
     override def apiVersion: String = "1.0"
     override def swaggerVersion: String = "1.2"
     override def baseUrl: String = "/api"
@@ -41,15 +44,26 @@ class ApiServiceActor extends Actor with ApiService {
 @Api(value = "/scrape_url", description = "Allows you to scrape a URL using an external call to http://metascraper.beachape.com")
 trait ApiService extends HttpService {
 
-  implicit val exceutionContext = actorRefFactory.dispatcher
+  import JsonUnmarshallSupport._
 
-  val pipeline = sendReceive
+  implicit val exceutionContext = actorRefFactory.dispatcher
+  implicit def unsuccessfulResponseHandler(implicit log: LoggingContext) = ExceptionHandler {
+    case e: UnsuccessfulResponseException => complete(
+      UnprocessableEntity,
+      ErrorResponse(
+        s"The URL could not be processed. ${e.response.entity.asString}",
+        e.getStackTraceString))
+  }
+
+  val pipeline = sendReceive ~> unmarshal[ScrapedData]
   val apiRoutes = scrapeRoute
 
   @ApiOperation(
     value = "Scrape a URL ",
     notes = " Sends a request to http://metascraper.beachape.com to get it scraped.",
-    httpMethod = "POST")
+    httpMethod = "POST",
+    response = classOf[ScrapedData]
+  )
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
       name = "url",
@@ -59,18 +73,14 @@ trait ApiService extends HttpService {
       paramType = "body")
   ))
   @ApiResponses(Array(
-    new ApiResponse(code = 500, message = "Server error ")
+    new ApiResponse(code = 500, message = "Server error "),
+    new ApiResponse(code = 422, message = "Unprocessable URL", response = classOf[ErrorResponse])
   ))
   def scrapeRoute = path ("api" / "scrape_url"){
     post {
       respondWithMediaType(`application/json`) {
         entity(as[UrlScrape]) { urlScrape =>
-          complete(
-            pipeline(
-              Get(
-                "http://metascraper.beachape.com/scrape/" + java.net.URLEncoder.encode(urlScrape.url, "UTF8")
-              )
-            ).map (_.entity.asString) )
+          complete (scrapeFuture(urlScrape.url))
         }
       }
     }
@@ -82,5 +92,10 @@ trait ApiService extends HttpService {
       pathSingleSlash { getFromResource("swagger/index.html") } ~
       getFromResourceDirectory("swagger")
     }
+
+  def scrapeFuture(url: String): Future[ScrapedData] = pipeline( Get(
+      "http://metascraper.beachape.com/scrape/" + java.net.URLEncoder.encode(url, "UTF8")
+    )
+  )
 
 }

@@ -5,4 +5,4 @@ import scala.annotation.meta.field
 
 @ApiModel(description = "URL Scrape message")
 case class UrlScrape(
-                      @(ApiModelProperty @field)(value = "TODO: url description") url: String)
+                      @(ApiModelProperty @field)(value = "url description") url: String)

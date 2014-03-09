@@ -21,7 +21,7 @@ class ApiServiceActor extends Actor with ApiService {
     override def modelTypes: Seq[Type] = List(typeOf[UrlScrape])
     override def apiVersion: String = "1.0"
     override def swaggerVersion: String = "1.2"
-    override def baseUrl: String = "/"
+    override def baseUrl: String = "/api"
     override def specPath: String = "api-spec"
     override def resourcePath: String = "resources"
   }
@@ -33,7 +33,7 @@ class ApiServiceActor extends Actor with ApiService {
   // this actor only runs our route, but you could add
   // other things here, like request stream processing
   // or timeout handling
-  def receive = runRoute(apiRoutes ~ swaggerService.routes)
+  def receive = runRoute(apiRoutes ~ swaggerService.routes ~ swaggerUI )
 }
 
 
@@ -46,14 +46,22 @@ trait ApiService extends HttpService {
   val pipeline = sendReceive
   val apiRoutes = scrapeRoute
 
-  @ApiOperation(value = "Scrape a URL.", notes = "Sends a request to http://metascraper.beachape.com to get it scraped", httpMethod = "POST")
+  @ApiOperation(
+    value = "Scrape a URL ",
+    notes = " Sends a request to http://metascraper.beachape.com to get it scraped.",
+    httpMethod = "POST")
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "url", value = "The URL to scrape", required = true, dataType = "String", paramType = "body")
+    new ApiImplicitParam(
+      name = "url",
+      value = "The URL to scrape. This should be a JSON string, e.g. { \"url\" : \"http://www.beachape.com/\" } ",
+      required = true,
+      dataType = "UrlScrape",
+      paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Server error ")
   ))
-  def scrapeRoute = path ("scrape_url"){
+  def scrapeRoute = path ("api" / "scrape_url"){
     post {
       respondWithMediaType(`application/json`) {
         entity(as[UrlScrape]) { urlScrape =>
@@ -67,5 +75,12 @@ trait ApiService extends HttpService {
       }
     }
   }
+
+  val swaggerUI = path("swagger") {
+    pathEnd { redirect("/swagger/", StatusCodes.PermanentRedirect) } } ~
+    pathPrefix("swagger") {
+      pathSingleSlash { getFromResource("swagger/index.html") } ~
+      getFromResourceDirectory("swagger")
+    }
 
 }

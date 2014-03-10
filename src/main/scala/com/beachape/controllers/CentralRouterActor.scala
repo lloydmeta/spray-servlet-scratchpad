@@ -20,7 +20,7 @@ import com.beachape.models.ErrorResponse
  * we want to be able to test it independently, without having to spin up an actor
  */
 
-class ServiceActor extends Actor with HttpService {
+class CentralRouterActor extends Actor with HttpService {
 
   // Absolutely necessary in order to support marshalling of error messages
   import JsonUnmarshallSupport._

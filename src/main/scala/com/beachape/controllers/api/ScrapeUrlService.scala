@@ -1,42 +1,36 @@
-package com.beachape.controllers
+package com.beachape.controllers.api
 
-import spray.routing._
 import spray.http._
 import MediaTypes._
 import spray.client.pipelining._
 import com.beachape.models._
 import com.wordnik.swagger.annotations._
 import scala.concurrent.Future
-import spray.util.LoggingContext
-import spray.httpx.UnsuccessfulResponseException
-import spray.http.StatusCodes._
+import com.beachape.controllers.JsonUnmarshallSupport
+import akka.actor.ActorRefFactory
 
 /**
- * This trait defines the api/scrape_url path of our API and it does so
- * independently from the service actor. This is the rough equivalent of a "service"
+ * Defines the /api/scrape_url path of our API. This is the rough equivalent of a "service"
  * in DropWizard.
  *
- * Note the at the value of the @Api annotation is set to /scrape_url
- * This is because baseUrl is set to /api in our instantiation of
- * [[com.gettyimages.spray.swagger.SwaggerHttpService]] in [[ServiceActor]].
+ * Note that the value of the @Api annotation is set to /scrape_url. This is because
+ * this class extends ApiService, which defines the `routes` method to be a reduceLeft
+ * over the `declaredRoutes` sequence, and then puts it under the '/api' prefix
+ *
  * This appears to be necessary because otherwise SwaggerUI will make requests
- * relative to the specPath ('api-spec')..might be fixable
+ * relative to the specPath ('api-spec').. need to check if this is proper behaviour
   */
 @Api(value = "/scrape_url", description = "Allows you to scrape a URL using an external call to http://metascraper.beachape.com")
-trait ApiScrapeUrlService extends HttpService {
+class ScrapeUrlService(implicit val actorRefFactory: ActorRefFactory) extends ApiService {
 
   // Absolutely necessary in order to support marshalling.
   import JsonUnmarshallSupport._
-
   implicit val executionContext = actorRefFactory.dispatcher
 
   val pipeline = sendReceive ~> unmarshal[ScrapedData]
-  val pathPrefix = "api"
 
-  // All the routes in this trait composed.
-  val apiScrapeUrlRoutes = pathPrefix(pathPrefix) {
-    scrapeRoute
-  }
+  // All the routes in this class composed.
+  val declaredRoutes = Seq(scrapeRoute)
 
   @ApiOperation(
     value = "Scrape a URL ",

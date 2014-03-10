@@ -2,13 +2,14 @@ package com.beachape.controllers
 
 import spray.http.StatusCodes
 import spray.routing.HttpService
+import akka.actor.ActorRefFactory
 
 /**
  * Service that implements the route for SwaggerUI
  */
-trait SwaggerUIService extends HttpService {
+class SwaggerUIService(implicit val actorRefFactory: ActorRefFactory) extends HttpService {
 
-  val swaggerUI = path("swagger") {
+  def routes = path("swagger") {
     pathEnd { redirect("/swagger/", StatusCodes.PermanentRedirect) } } ~
     pathPrefix("swagger") {
       pathSingleSlash { getFromResource("swagger/index.html") } ~

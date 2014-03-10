@@ -24,8 +24,8 @@ libraryDependencies ++= {
     "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container"  artifacts Artifact("javax.servlet", "jar", "jar"),
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV % "test",
-    "org.specs2"          %%  "specs2"        % "2.2.3" % "test",
     "com.wordnik" %% "swagger-core" % "1.3.0",
+    "org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
     "com.beachape.metascraper" %% "metascraper" % "0.2.5"
   )
 }

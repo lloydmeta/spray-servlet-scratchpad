@@ -1,16 +1,12 @@
 package com.beachape.controllers
 
-import akka.actor.{ActorRefFactory, Actor}
-import com.gettyimages.spray.swagger.SwaggerHttpService
-import scala.reflect.runtime.universe._
+import akka.actor.Actor
 import spray.util.LoggingContext
 import spray.routing._
 import spray.httpx.UnsuccessfulResponseException
 import spray.http.StatusCodes._
-import com.beachape.controllers.api.ScrapeUrlService
+import com.beachape.controllers.api._
 import spray.routing.MalformedRequestContentRejection
-import com.beachape.models.ScrapedData
-import com.beachape.models.UrlScrape
 import scala.Some
 import com.beachape.models.ErrorResponse
 
@@ -37,16 +33,7 @@ class ServiceActor extends Actor with HttpService {
   implicit val actorRefFactory = context
 
   // Instantiate our Service classes
-  val swaggerService: SwaggerHttpService = new SwaggerHttpService { // SwaggerHttpService is from swagger-spray by GettyImages
-    override def actorRefFactory: ActorRefFactory = context
-    override def apiTypes: List[Type] = List(typeOf[ScrapeUrlService])
-    override def modelTypes: Seq[Type] = List(typeOf[UrlScrape], typeOf[ScrapedData], typeOf[ErrorResponse])
-    override def apiVersion: String = "1.0"
-    override def swaggerVersion: String = "1.2"
-    override def baseUrl: String = "/api"
-    override def specPath: String = "api-spec"
-    override def resourcePath: String = "resources"
-  }
+  val swaggerResourcesService = new SwaggerResourcesService
   val apiScrapeUrlService = new ScrapeUrlService
   val swaggerUIService = new SwaggerUIService
 
@@ -79,6 +66,6 @@ class ServiceActor extends Actor with HttpService {
    */
   def receive = runRoute(
     apiScrapeUrlService.routes ~
-    swaggerService.routes ~
+    swaggerResourcesService.routes ~
     swaggerUIService.routes)
 }

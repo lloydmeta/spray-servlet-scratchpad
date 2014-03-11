@@ -33,10 +33,10 @@ class ServiceActor extends Actor with HttpService {
   // that get instantiated further down
   implicit val actorRefFactory = context
 
-  // Instantiate our Service classes
-  val swaggerResourcesService = new Swagger
-  val apiScrapeUrlService = new ScrapeUrl
-  val swaggerUIService = new SwaggerUI
+  // Instantiate our Resources
+  val apiSwaggerResource = new Swagger
+  val apiScrapeUrlResource = new ScrapeUrl
+  val swaggerUIResource = new SwaggerUI
 
   // Implicit Exception handler
   // See http://spray.io/documentation/1.1-SNAPSHOT/spray-routing/key-concepts/exception-handling/
@@ -66,7 +66,7 @@ class ServiceActor extends Actor with HttpService {
    * [[spray.routing.HttpService]]s that actually define those routes
    */
   def receive = runRoute(
-    apiScrapeUrlService.routes ~
-    swaggerResourcesService.routes ~
-    swaggerUIService.routes)
+    apiScrapeUrlResource.routes ~
+    apiSwaggerResource.routes ~
+    swaggerUIResource.routes)
 }

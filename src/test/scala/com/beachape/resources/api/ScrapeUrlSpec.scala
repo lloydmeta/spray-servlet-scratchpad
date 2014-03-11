@@ -1,4 +1,4 @@
-package com.beachape.controllers.api
+package com.beachape.resources.api
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import spray.testkit.ScalatestRouteTest
@@ -8,15 +8,15 @@ import scala.concurrent.duration._
 import java.lang.IllegalArgumentException
 import spray.routing.HttpService
 import com.beachape.models.UrlScrape
-import com.beachape.controllers.JsonUnmarshallSupport
+import com.beachape.resources.JsonUnmarshallSupport
 
-class ScrapeUrlServiceSpec extends FunSpec with ScalatestRouteTest with ShouldMatchers with HttpService {
+class ScrapeUrlSpec extends FunSpec with ScalatestRouteTest with ShouldMatchers with HttpService {
 
   import JsonUnmarshallSupport._
 
   implicit val routeTestTimeout = RouteTestTimeout(FiniteDuration(5, SECONDS))
   implicit val actorRefFactory = system
-  val scrapeUrlService = new ScrapeUrlService
+  val scrapeUrlService = new ScrapeUrl
   val routes = scrapeUrlService.routes
 
   describe("ApiService") {

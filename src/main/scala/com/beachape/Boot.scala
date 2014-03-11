@@ -2,7 +2,6 @@ package com.beachape
 
 import akka.actor.{Props, ActorSystem}
 import spray.servlet.WebBoot
-import com.beachape.controllers.CentralRouterActor
 
 // this class is instantiated by the servlet initializer
 // it needs to have a default constructor and implement
@@ -13,6 +12,6 @@ class Boot extends WebBoot {
   val system = ActorSystem("beachape")
 
   // the service actor replies to incoming HttpRequests
-  val serviceActor = system.actorOf(Props[CentralRouterActor])
+  val serviceActor = system.actorOf(Props[ServiceActor])
 
 }

@@ -1,11 +1,11 @@
-package com.beachape.controllers.api
+package com.beachape.resources.api
 
 import spray.routing.{HttpService, Route}
 
 /**
  * Trait for ApiService classes to inherit from
  */
-trait ApiService extends HttpService {
+trait ResourceBase extends HttpService {
 
   val pathPrefix = "api"
   def declaredRoutes: Seq[Route]

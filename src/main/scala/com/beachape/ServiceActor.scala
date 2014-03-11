@@ -1,14 +1,15 @@
-package com.beachape.controllers
+package com.beachape
 
 import akka.actor.Actor
 import spray.util.LoggingContext
 import spray.routing._
 import spray.httpx.UnsuccessfulResponseException
 import spray.http.StatusCodes._
-import com.beachape.controllers.api._
 import spray.routing.MalformedRequestContentRejection
 import scala.Some
 import com.beachape.models.ErrorResponse
+import com.beachape.resources._
+import com.beachape.resources.api._
 
 /**
  * Central actor that handles routing.
@@ -20,7 +21,7 @@ import com.beachape.models.ErrorResponse
  * we want to be able to test it independently, without having to spin up an actor
  */
 
-class CentralRouterActor extends Actor with HttpService {
+class ServiceActor extends Actor with HttpService {
 
   // Absolutely necessary in order to support marshalling of error messages
   import JsonUnmarshallSupport._
@@ -33,9 +34,9 @@ class CentralRouterActor extends Actor with HttpService {
   implicit val actorRefFactory = context
 
   // Instantiate our Service classes
-  val swaggerResourcesService = new SwaggerResourcesService
-  val apiScrapeUrlService = new ScrapeUrlService
-  val swaggerUIService = new SwaggerUIService
+  val swaggerResourcesService = new Swagger
+  val apiScrapeUrlService = new ScrapeUrl
+  val swaggerUIService = new SwaggerUI
 
   // Implicit Exception handler
   // See http://spray.io/documentation/1.1-SNAPSHOT/spray-routing/key-concepts/exception-handling/

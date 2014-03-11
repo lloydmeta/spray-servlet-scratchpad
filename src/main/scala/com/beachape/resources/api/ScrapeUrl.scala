@@ -1,4 +1,4 @@
-package com.beachape.controllers.api
+package com.beachape.resources.api
 
 import spray.http._
 import MediaTypes._
@@ -6,7 +6,7 @@ import spray.client.pipelining._
 import com.beachape.models._
 import com.wordnik.swagger.annotations._
 import scala.concurrent.Future
-import com.beachape.controllers.JsonUnmarshallSupport
+import com.beachape.resources.JsonUnmarshallSupport
 import akka.actor.ActorRefFactory
 
 /**
@@ -21,7 +21,7 @@ import akka.actor.ActorRefFactory
  * relative to the specPath ('api-spec').. need to check if this is proper behaviour
   */
 @Api(value = "/scrape_url", description = "Allows you to scrape a URL using an external call to http://metascraper.beachape.com")
-class ScrapeUrlService(implicit val actorRefFactory: ActorRefFactory) extends ApiService {
+class ScrapeUrl(implicit val actorRefFactory: ActorRefFactory) extends ResourceBase {
 
   // Absolutely necessary in order to support marshalling.
   import JsonUnmarshallSupport._

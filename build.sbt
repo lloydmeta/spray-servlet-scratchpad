@@ -7,7 +7,9 @@ scalaVersion  := "2.10.3"
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 resolvers ++= Seq(
-  "spray repo" at "http://repo.spray.io/"
+  "spray repo" at "http://repo.spray.io/",
+  "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
+  "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
 )
 
 libraryDependencies ++= {
@@ -26,7 +28,8 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV % "test",
     "com.wordnik" %% "swagger-core" % "1.3.0",
     "org.scalatest" %% "scalatest" % "2.1.0" % "test",
-    "com.beachape.metascraper" %% "metascraper" % "0.2.5"
+    "com.beachape.metascraper" %% "metascraper" % "0.2.5",
+    "com.gettyimages" %% "spray-swagger" % "0.2.4"
   )
 }
 
